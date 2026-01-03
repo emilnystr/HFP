@@ -1,10 +1,6 @@
-# HFP
-The Heat Flow Program is a one‑dimensional finite element simulation designed to compute temperature development through layered materials exposed to fire.
-
-
 # 1D Transient Heat Conduction Solver
 
-Denna solver simulerar **1D transient värmeledning** med temperatur som primär variabel. Den använder en nodbaserad explicit metod istället för traditionella matrisoperationer, vilket gör den enkel, snabb och minnes-effektiv.
+Denna solver simulerar **1D transient värmeledning** med temperatur som primär variabel. Den använder en nodbaserad explicit metod istället för traditionella matrisoperationer.
 
 ---
 
@@ -23,35 +19,35 @@ där:
 - \(\rho(T)\) = densitet [kg/m³]  
 - \(c(T)\) = specifik värmekapacitet [J/kg·K]  
 
-Randvillkor (strålning + konvektion) hanteras per nod:
+Randvillkor (strålning + konvektion) per nod:
 
 \[
-\dot{Q}_i = \varepsilon \sigma (T_r^4 - T_i^4) + h(T_g - T_i)
+\dot{Q}_i = \varepsilon \sigma \left(T_r^4 - T_i^4\right) + h \left(T_g - T_i\right)
 \]
 
 ---
 
 ## 2. Diskretisering
 
-### 2.1 Element och noder
+### 2.1 Noder och element
 
-Materialet delas in i \(n_\text{elem}\) linjära element med noder \(i = 0,1,...,n\). Varje element \(e\) kopplar två noder \(i\) och \(j=i+1\).  
+Mesh med \(n_\text{elem}\) linjära element, noder \(i = 0,1,...,n\).  
+Element \(e\) kopplar noder \(i\) och \(j=i+1\) med längd \(\Delta x_e\).
 
-- Noderna lagrar temperaturer \(T_i\) vid varje tidssteg.  
-- Elementets längd är \(\Delta x_e\).
+---
 
 ### 2.2 Lumpad kapacitetsmatris
 
-Istället för att bygga en full matris används **lumpad kapacitans** per nod:
+Lumpad kapacitans per nod:
 
 \[
 C_i = \sum_{\text{element } e \ni i} \frac{\rho_e c_e \Delta x_e}{2}
 \]
 
-Detta motsvarar den diagonala kapacitetsmatrisen i klassisk FEM:
+Motsvarar diagonal kapacitetsmatris i FEM:
 
 \[
-\overline{\mathbf{C}} = 
+\mathbf{C} =
 \begin{bmatrix}
 C_0 & 0 & \dots & 0 \\
 0 & C_1 & \dots & 0 \\
@@ -64,45 +60,42 @@ C_0 & 0 & \dots & 0 \\
 
 ### 2.3 Konduktivitetsbidrag
 
-För varje element \(e\) beräknas ledningsflödet mellan nod \(i\) och \(j\):
+För element \(e\) med noder \(i,j\):
 
 \[
-q_{i\to j} = \frac{k_e}{\Delta x_e} (T_i - T_j)
+q_{i\to j} = \frac{k_e}{\Delta x_e} \left( T_i - T_j \right)
 \]
 
-Detta är exakt samma som att multiplicera elementets konduktivitetsmatris med temperaturvektorn:
+Global nodvektor:
 
 \[
-K^e = \frac{k_e}{\Delta x_e} 
-\begin{bmatrix} 1 & -1 \\ -1 & 1 \end{bmatrix}
+Q_i = \sum_{\text{grannar } j} q_{i \to j} + Q_i^\text{boundary}
 \]
 
-Globalt ackumuleras bidragen till nodernas effektvektor:
+Detta motsvarar matrisformeln:
 
 \[
-Q_i = \sum_{\text{grannar}} q_{i \to j} + Q_i^\text{boundary}
+\mathbf{K}^e =
+\frac{k_e}{\Delta x_e} 
+\begin{bmatrix} 1 & -1 \\ -1 & 1 \end{bmatrix}, \quad
+\mathbf{Q} = \mathbf{Q} - \mathbf{K} \mathbf{T}
 \]
 
 ---
 
 ## 3. Explicit tidssteg
 
-Solvern använder **explicit Euler** för tidsintegration:
+Temperaturen uppdateras nod för nod med **explicit Euler**:
 
 \[
 T_i^{n+1} = T_i^n + \Delta t \frac{Q_i}{C_i}
 \]
 
-- \(C_i\) är nodens lumpade kapacitet  
-- \(Q_i\) är summan av ledningsflöden och randvillkor  
-
-Detta motsvarar den diskreta FEM-formeln:
+Motsvarar den diskreta FEM-formeln:
 
 \[
-\bar{\mathbf{T}}^{j+1} = \bar{\mathbf{T}}^j + \Delta t \, \overline{\mathbf{C}}^{-1} \left[ \bar{\mathbf{Q}}^j - \mathbf{K} \bar{\mathbf{T}}^j \right]
+\mathbf{T}^{j+1} = \mathbf{T}^{j} + \Delta t \, \mathbf{C}^{-1} (\mathbf{Q}^j - \mathbf{K} \mathbf{T}^j)
 \]
-
-Skillnaden är att vi **direkt beräknar varje nods uppdatering utan att skapa stora matriser**, vilket ger samma resultat.
 
 ---
 
@@ -111,31 +104,30 @@ Skillnaden är att vi **direkt beräknar varje nods uppdatering utan att skapa s
 Exponerad sida (eld):
 
 \[
-Q_0^\text{boundary} = \varepsilon \sigma (T_\text{fire}^4 - T_0^4) + h_\text{exposed} (T_\text{fire} - T_0)
+Q_0^\text{boundary} = \varepsilon \sigma \left(T_\text{fire}^4 - T_0^4\right) + h_\text{exposed} \left(T_\text{fire} - T_0\right)
 \]
 
 Oexponerad sida (ambient):
 
 \[
-Q_n^\text{boundary} = \varepsilon \sigma (T_\text{ambient}^4 - T_n^4) + h_\text{ambient} (T_\text{ambient} - T_n)
+Q_n^\text{boundary} = \varepsilon \sigma \left(T_\text{ambient}^4 - T_n^4\right) + h_\text{ambient} \left(T_\text{ambient} - T_n\right)
 \]
 
 ---
 
-## 5. Varför detta ger samma resultat som traditionell FEM
+## 5. Ekvivalens med traditionell FEM
 
-1. **Lumpad kapacitans** motsvarar diagonalelementen i \(C\)-matrisen i standard FEM.  
-2. **Elementledningsflöden** beräknas exakt som \(\mathbf{K}\mathbf{T}\).  
-3. **Explicit Euler** ger samma tidsdiskretisering som \(\bar{\mathbf{T}}^{j+1} = \bar{\mathbf{T}}^j + \Delta t C^{-1}(\bar{Q} - K \bar{T})\).  
-4. **Boundary conditions** adderas direkt till nodvektorn, vilket är ekvivalent med FEM:s globalvektor.  
+1. Lumpad kapacitans \(C_i\) ↔ diagonalelement i \(\mathbf{C}\)  
+2. Ledningsflöden \(q_{i\to j}\) ↔ elementets \(\mathbf{K}^e \mathbf{T}\)  
+3. Explicit tidssteg ↔ \(\mathbf{T}^{j+1} = \mathbf{T}^j + \Delta t \mathbf{C}^{-1} (\mathbf{Q}^j - \mathbf{K} \mathbf{T}^j)\)  
+4. Boundary conditions adderas direkt till nodvektorn  
 
-> Slutsats: nodbaserad explicit implementation är algebraiskt identisk med standard FEM, men sparar minne och undviker onödiga matrisoperationer.
+> Slutsats: Nodbasserad explicit implementation ger **exakt samma algebraiska resultat** som traditionell FEM, men utan att skapa fulla matriser.
 
 ---
 
 ## 6. Sammanfattning
 
-- Solvern är **1D lumpad FEM med explicit tidssteg**.  
-- Beräkning sker **direkt per nod**, vilket undviker fulla matrismultiplikationer.  
-- Resultaten är **matematiskt ekvivalenta** med traditionell FEM.
-
+- **1D lumpad FEM** med explicit tidssteg  
+- Beräkning sker **direkt per nod**, sparar minne och undviker onödiga matrisoperationer  
+- Resultaten är **matematiskt identiska** med standard FEM
