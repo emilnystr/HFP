@@ -23,5 +23,7 @@ class parameters {
     double constant_surface_temp = 1000;
 };
 
+parameters load_config (const std::string& filename);
+
 
 #endif

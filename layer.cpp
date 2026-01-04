@@ -1,15 +1,13 @@
 #include "layer.h"
 
 std::vector<Layer> load_layers_from_file(const std::vector<MaterialProperty>& materials) {
-    std::vector<Layer> layers;
-    std::cout << "\nLäser lagerkonfiguration från 'material/Material.txt'..." << std::endl;
-    
+    std::vector<Layer> layers;    
     std::ifstream file("material/Material.txt");
     if (!file.is_open()) {
-        std::cout << "  Kunde inte öppna 'material/Material.txt'. Använder standardkonfiguration." << std::endl;
-        layers.push_back({13.0, "stal", 1});
+        std::cout << "  Kunde inte öppna 'material/Material.txt'" << std::endl;
+       /* layers.push_back({13.0, "stal", 1});
         layers.push_back({100.0, "betong", 0});
-        return layers;
+        return layers;*/
     }
     
     std::string line;
@@ -58,14 +56,6 @@ std::vector<Layer> load_layers_from_file(const std::vector<MaterialProperty>& ma
         layers.push_back({thickness, material_name, material_index});
         
         
-    }
-    
-    file.close();
-    
-    if (layers.empty()) {
-        std::cout << "  Filen var tom. Använder standardkonfiguration." << std::endl;
-        layers.push_back({13.0, "stal", 1});
-        layers.push_back({100.0, "betong", 0});
     }
     
     return layers;

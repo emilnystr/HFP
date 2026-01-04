@@ -1,6 +1,6 @@
 #include "config.h"
 
-parameters load_config (std::string& filename) {
+parameters load_config (const std::string& filename) {
     parameters config;
 
     std::ifstream file(filename);
@@ -74,6 +74,7 @@ parameters load_config (std::string& filename) {
             config.stefan_boltzmann = std::stod(value);
         }
     }
-    file.close();
+    //destruktorn i ifstream stänger filen automatiskt när objektet går ur scope
+    //file.close();
     return config;
 }

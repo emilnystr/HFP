@@ -11,6 +11,7 @@ double hc180_fire_curve(double time) {
 
 double parametric_fire(double time) {
 
+    return 0;
 }
 
 
@@ -27,4 +28,6 @@ double fire_temperature(double time, const parameters& cfg)
 
     if (cfg.fire_curve_exposed == 4)
         return cfg.constant_surface_temp;
+
+    return iso_fire_curve(time);
 }
