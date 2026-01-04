@@ -34,7 +34,14 @@ SIGMA = 5.67e-8
 
 These are the default parameters and can be adjusted by the user.
 
-In the same directory as the executable, create a folder named:
+In the same directory as the executable, create a folder named: material
+This folder will contain all material definition files.
 
+### Add material files
 In the material directory the material files are created by rows as:
 Temperature Conductivity SpecificHeat Density
+
+
+## Author
+
+Developed by Emil Nyström, fire safety specialist.
