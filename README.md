@@ -41,6 +41,9 @@ This folder will contain all material definition files.
 In the material directory the material files are created by rows as:
 Temperature Conductivity SpecificHeat Density
 
+## Running the executable
+Run the executable through you terminal and the final temperature will show. It will also be exported to a csv file which can be plotted in excel.
+
 
 ## Author
 
