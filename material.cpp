@@ -50,10 +50,6 @@ std::vector<MaterialProperty> load_materials_from_directory(
 
     for (const std::filesystem::directory_entry& entry : directory_iterator) {
 
-        if (!entry.is_regular_file()) {
-            continue;
-        }
-
         std::filesystem::path file_path = entry.path();
         std::string file_name = file_path.filename().string();
 
@@ -61,13 +57,8 @@ std::vector<MaterialProperty> load_materials_from_directory(
             continue;  
         }
 
-        std::string file_extension = file_path.extension().string();
-        if (file_extension != ".txt") {
-            continue;
-        }
-
-        std::ifstream file_stream;
-        file_stream.open(file_path);
+        std::ifstream file;
+        file.open(file_path);
 
         MaterialProperty material;
 
@@ -81,7 +72,7 @@ std::vector<MaterialProperty> load_materials_from_directory(
         double specific_heat_value = 0;
         double density_value = 0;
 
-        while (file_stream >> temperature_value
+        while (file >> temperature_value
                    >> conductivity_value
                    >> specific_heat_value
                    >> density_value) {
@@ -92,9 +83,6 @@ std::vector<MaterialProperty> load_materials_from_directory(
         material.density.push_back(density_value);
         
         }
-
-        file_stream.close();
-
         materials.push_back(material);
     }
 

@@ -74,7 +74,5 @@ parameters load_config (const std::string& filename) {
             config.stefan_boltzmann = std::stod(value);
         }
     }
-    //destruktorn i ifstream stänger filen automatiskt när objektet går ur scope
-    //file.close();
     return config;
 }
