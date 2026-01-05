@@ -21,6 +21,13 @@ class parameters {
     double ambient_temperature = 20;
     int fire_curve_exposed = 2;
     double constant_surface_temp = 1000;
+
+    double Av = 30;
+    double At = 500;
+    double heq = 1.5;
+    double b = 1800;
+    double q_td = 162;
+    double growth_rate = 15;
 };
 
 parameters load_config (const std::string& filename);

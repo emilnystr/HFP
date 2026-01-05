@@ -72,6 +72,24 @@ parameters load_config (const std::string& filename) {
 
         } else if (key == "SIGMA") {
             config.stefan_boltzmann = std::stod(value);
+
+        } else if (key == "AV") {
+            config.Av = std::stod(value);
+
+        } else if (key == "AT") {
+            config.At = std::stod(value);
+
+        } else if (key == "HEQ") {
+            config.heq = std::stod(value);
+
+        } else if (key == "B") {
+            config.b = std::stod(value);
+
+        } else if (key == "Q_TD") {
+            config.q_td = std::stod(value);
+
+        } else if (key == "GROWTH_RATE") {
+            config.growth_rate = std::stod(value);
         }
     }
     return config;
