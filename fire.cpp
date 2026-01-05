@@ -9,9 +9,15 @@ double hc180_fire_curve(double time) {
 }
 
 
-double parametric_fire(double time) {
+double parametric_fire(double time, parameters& cfg) {
+    double Av = cfg.Av;
+    double At = cfg.At;
+    double heq = cfg.heq;
+    double b = cfg.b;
+    double q_td = cfg.q_td;
+    double growth = cfg.growth_rate;
 
-    return 0;
+    
 }
 
 
