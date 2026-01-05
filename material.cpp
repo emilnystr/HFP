@@ -1,6 +1,6 @@
 #include "material.h"
 
-void FastMaterial::precompute(const std::vector<double>& temperature_input,
+void MaterialTable::precompute(const std::vector<double>& temperature_input,
                    const std::vector<double>& rho_input,
                    const std::vector<double>& cp_input,
                    const std::vector<double>& k_input) {
@@ -8,6 +8,7 @@ void FastMaterial::precompute(const std::vector<double>& temperature_input,
     k.resize(table_size);
     c.resize(table_size);
     rho.resize(table_size);
+    enthalpy.resize(table_size);
     
     for (int t = 0; t < table_size; ++t) {
         double temp = (double)t;
@@ -34,6 +35,12 @@ void FastMaterial::precompute(const std::vector<double>& temperature_input,
             c[t] = cp_input[i] + frac * (cp_input[i+1] - cp_input[i]);     
             rho[t] = rho_input[i] + frac * (rho_input[i+1] - rho_input[i]);
         }
+    }
+    enthalpy[0] = 0;
+
+    for (int t = 1; t < table_size; ++t) {
+        double dT = 1;
+        enthalpy[t] = enthalpy[t - 1] + c[t] * rho[t] * dT;
     }
 }
 

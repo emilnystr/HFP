@@ -8,5 +8,5 @@
 #include "fire.h"
 #include "matrix.h"
 
-void run_matrix_simulation (const Mesh& mesh, const std::vector<FastMaterial>& fast_materials, 
+void run_matrix_simulation (const Mesh& mesh, const std::vector<MaterialTable>& fast_materials, 
     const parameters& cfg);

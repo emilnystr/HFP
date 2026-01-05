@@ -17,11 +17,12 @@ class MaterialProperty {
     std::vector<double> density;
 };
 
-class FastMaterial {
+class MaterialTable {
     public:
-    std::vector<double> k;   // Värmeledningsförmåga
-    std::vector<double> c;   // Specifik värmekapacitet
-    std::vector<double> rho; // Densitet
+    std::vector<double> k;  
+    std::vector<double> c;   
+    std::vector<double> rho; 
+    std::vector<double> enthalpy;
     
     void precompute(const std::vector<double>& temperature_input,
                    const std::vector<double>& rho_input,

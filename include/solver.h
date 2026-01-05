@@ -11,7 +11,7 @@
 #include "fire.h"
 
 void run_simulation(const parameters& cfg,
-                    const std::vector<FastMaterial>& fast_materials,
+                    const std::vector<MaterialTable>& fast_materials,
                     const Mesh& mesh);
 
 #endif

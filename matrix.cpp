@@ -3,7 +3,7 @@
 
 global_matrices compute_global_matrices(
     const Mesh& mesh,
-    const std::vector<FastMaterial>& fast_materials,
+    const std::vector<MaterialTable>& fast_materials,
     const std::vector<double>& T)
 {
     int n = mesh.num_nodes;

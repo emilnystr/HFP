@@ -32,8 +32,12 @@ int main() {
     std::cout << std::endl;
     
     auto materials = load_materials_from_directory();
+
+    /*nåt sånt här typ: for (auto& mat : materials) { 
+    mat.compute_enthalpy(); }
+    */
     
-    std::vector<FastMaterial> fast_materials(materials.size());
+    std::vector<MaterialTable> fast_materials(materials.size());
     for (size_t i = 0; i < materials.size(); ++i) {
         fast_materials[i].precompute(
             materials[i].temperature,
