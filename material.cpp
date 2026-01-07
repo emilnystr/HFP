@@ -37,7 +37,7 @@ void MaterialTable::precompute(const std::vector<double>& temperature_input,
         }
     }
     enthalpy[0] = 0;
-
+//build the enthalpy table
     for (int t = 1; t < table_size; ++t) {
         double dT = 1;
         enthalpy[t] = enthalpy[t - 1] + c[t] * rho[t] * dT;

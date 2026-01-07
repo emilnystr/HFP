@@ -14,9 +14,7 @@ std::vector<double> getE(const Mesh& mesh,
 
 
 
-std::vector<double> getTfromE (const Mesh& mesh,
-    const std::vector<MaterialTable>& fast_materials,
-    const std::vector<double>& T_prev, std::vector<double> E);
-
+std::vector<double> getTfromE (const Mesh& mesh, const std::vector<MaterialTable>& fast_materials,
+    const std::vector<double>& T_prev, std::vector<double>&  E);
     
-#endif
+#endif 
