@@ -45,7 +45,6 @@ class MaterialTable {
 
     }
 
-    // Hämta entalpi för en given temperatur samt derivata
     void get_enthalpy(double T, double& e, double& dedT) const {
         if (T < 0) T = 0;
         if (T > 2000) T = 2000;
@@ -64,7 +63,6 @@ class MaterialTable {
         dedT = (enthalpy[T2] - enthalpy[T1]); //step = 1 implicit divided by 1 therefore
     }
 
-    // Hämta entalpi utan derivata
     double get_enthalpy_value(double T) const {
         if (T < 0) T = 0;
         if (T > 2000) T = 2000;
