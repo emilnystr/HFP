@@ -111,3 +111,127 @@ void run_simulation(const parameters& cfg,
         }
     }}
 }
+
+// Ny funktion med callback för animation
+void run_simulation_with_animation(
+    const parameters& cfg,
+    const std::vector<MaterialTable>& fast_materials,
+    const Mesh& mesh,
+    std::function<void(double time, 
+                       const std::vector<double>& positions,
+                       const std::vector<double>& temperatures)> callback,
+    int save_interval) {
+    
+    if (save_interval <= 0) save_interval = 1;
+    
+    std::vector<double> T(mesh.num_nodes, cfg.initial_temperature);
+    std::vector<double> T_next(mesh.num_nodes, 0);
+
+    // Q - K*T som en vektor
+    std::vector<double> Q_eff(mesh.num_nodes, 0);
+
+    // värmekapacitet
+    std::vector<double> C(mesh.num_nodes, 0);
+
+    // pointers till arrayerna
+    const double* dx_e = mesh.element_sizes.data();
+    const int* mat_e   = mesh.material_indices.data();
+
+    // pointers meningslösa här
+    const int n_elem  = mesh.num_elements;
+    const int n_node  = mesh.num_nodes;
+    const double dt   = cfg.time_step;
+    const int time_steps = (int)(cfg.simulation_time / dt);
+
+    // Skapa positionsvektorn (görs en gång)
+    std::vector<double> positions_mm(n_node);
+    double length = 0.0;
+    for (int i = 0; i < n_node; ++i) {
+        positions_mm[i] = length * 1000.0;
+        if (i < n_elem) {
+            length += dx_e[i];
+        }
+    }
+
+    // Anropa callback med initialdata
+    if (callback) {
+        callback(0.0, positions_mm, T);
+    }
+
+    for (int step = 0; step < time_steps; ++step) {
+        double current_time = (step + 1) * dt;  // Tid efter detta steg
+        double T_fire = fire_temperature(current_time, cfg);
+        
+        // nollställ värmeflödet efter varje tidssteg
+        std::fill(Q_eff.begin(), Q_eff.end(), 0.0);
+        std::fill(C.begin(), C.end(), 0.0);
+
+        for (int e = 0; e < n_elem; ++e) {
+            int i = e;       
+            int j = e + 1;   
+            double T_average = 0.5 * (T[i] + T[j]);
+
+            double k, c, rho;
+            fast_materials[mat_e[e]].get_props(T_average, k, c, rho);
+            double dx = dx_e[e];
+
+            C[i] += rho * c * dx * 0.5;
+            C[j] += rho * c * dx * 0.5;
+
+            double q = (k / dx) * (T[i] - T[j]);
+            Q_eff[i] -= q;
+            Q_eff[j] += q;
+        }
+
+        // Värmeflöde på exponerad nod
+        double T_front = T[0];
+        double q_exposed = cfg.stefan_boltzmann * cfg.emissivity * 
+                          (std::pow(T_fire + 273.15, 4) - std::pow(T_front + 273.15, 4)) + 
+                          cfg.h_exposed * (T_fire - T_front);
+        Q_eff[0] += q_exposed;
+
+        // Oexponerad sida
+        int n = n_node - 1;
+        double T_back = T[n];
+        double q_unexposed = cfg.stefan_boltzmann * cfg.emissivity * 
+                            (std::pow(cfg.ambient_temperature + 273.15, 4) - std::pow(T_back + 273.15, 4)) + 
+                            cfg.h_ambient * (cfg.ambient_temperature - T_back);
+        Q_eff[n] += q_unexposed;
+
+        // Uppdatera temperaturer
+        for (int i = 0; i < n_node; ++i) {
+            T_next[i] = T[i] + dt * (Q_eff[i] / C[i]);
+        }
+
+        // Spara datan om vi är på rätt steg
+        if (callback && (step % save_interval == 0)) {
+            callback(current_time, positions_mm, T_next);
+        }
+
+        // Byt till nästa temperaturvektor
+        std::swap(T, T_next);
+    }
+
+    // Spara sista steget om vi inte redan gjort det
+    if (callback && (time_steps % save_interval != 0)) {
+        double final_time = time_steps * dt;
+        callback(final_time, positions_mm, T);
+    }
+
+    // Skriv till CSV-fil (som tidigare)
+    std::cout << "Sluttemperaturer (C):\n";
+    std::ofstream csv("temperature_profile.csv");
+    csv << "Position_mm;Temperature_C\n";
+    
+    double length_csv = 0.0;
+    for (int i = 0; i < n_node; ++i) {
+        std::cout << length_csv * 1000 << "mm: " << T[i] << "\n";
+        csv << (length_csv * 1000.0) << ";" << T[i] << "\n";
+        
+        if (i < n_elem) {
+            length_csv += dx_e[i];
+        }
+    }
+    
+    std::cout << "\nData sparad till 'temperature_profile.csv'\n";
+}
