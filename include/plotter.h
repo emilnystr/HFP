@@ -3,23 +3,22 @@
 
 #include <vector>
 #include <string>
+#include <GLFW/glfw3.h>
 
 class TemperatureAnimator {
 private:
-    struct GLFWwindow* window;
-    int width, height;
+    GLFWwindow* window; //pointer till  GLFW fönster
+    int width;
+    int height;
     
-    // Animation data
-    std::vector<std::vector<double>> all_temperatures; // Temperaturer för varje frame
+    std::vector<std::vector<double>> all_temperatures; // Temperaturer för varje frame, varje frame = ett tidssteg
     std::vector<double> positions_mm;                  // Positioner (samma för alla frames)
     std::vector<double> time_steps;                    // Tider för varje frame
     
     // Animation state
     int current_frame;
     bool is_playing;
-    float animation_speed;
-    bool animation_complete;  // NY: håller koll på om animationen är klar
-    
+    float animation_speed;    
     // Grafikparametrar
     float minX, maxX, minY, maxY;
     float padding;
@@ -42,7 +41,6 @@ public:
     void animate(const std::string& title = "HFP Engine - Temperature Animation");
     
     // Funktioner för att hämta slutresultat
-    bool isComplete() const;
     std::vector<double> getFinalTemperatures() const;
     std::vector<double> getPositions() const;
     double getFinalTime() const;

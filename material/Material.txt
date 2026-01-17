@@ -1,4 +1,3 @@
 
 32 material1
 26 material2
-34 material3

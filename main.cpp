@@ -2,15 +2,34 @@
 #include <iomanip>
 #include <chrono>
 #include <vector>
-#include <algorithm>  // LÄGG TILL DENNA!
-#include <fstream>    // LÄGG TILL DENNA!
-#include <string>     // LÄGG TILL DENNA!
+#include <algorithm>
+#include <fstream>
+#include <string>
 #include "config.h"
 #include "material.h"
 #include "layer.h"
 #include "mesh.h"
 #include "solver.h"
 #include "plotter.h"
+
+// Deklarera globala variabler för att lagra data
+std::vector<std::vector<double>> all_temperatures;
+std::vector<double> all_times;
+std::vector<double> positions;
+
+// Din nya callback-funktion (inte lambda)
+void my_simulation_callback(double time, 
+                           const std::vector<double>& pos, 
+                           const std::vector<double>& temps) {
+    // Första gången: spara positions
+    if (positions.empty()) {
+        positions = pos;
+    }
+    
+    // Spara temperaturer och tid
+    all_temperatures.push_back(temps);
+    all_times.push_back(time);
+}
 
 int main() {
     std::cout << "Startar HFP-engine" << std::endl;
@@ -49,63 +68,45 @@ int main() {
     auto layers = load_layers_from_file(materials);
     Mesh mesh = create_mesh(layers, cfg);
     
-    // Vektorer för att samla animeringsdata
-    std::vector<std::vector<double>> all_temperatures;
-    std::vector<double> all_times;
-    std::vector<double> positions;
+    // Rensa de globala variablerna
+    all_temperatures.clear();
+    all_times.clear();
+    positions.clear();
     
     std::cout << "\nKör simulering och samlar data för animation..." << std::endl;
     
-    // Beräkna hur många steg vi ska spara (max 1000 frames för att inte bli för många)
+    // Beräkna hur många steg vi ska spara
     int total_steps = static_cast<int>(cfg.simulation_time / cfg.time_step);
-    int save_interval = std::max(1, total_steps / 1000);
+    int save_interval = 1;
     
     auto start_sim = std::chrono::high_resolution_clock::now();
     
-    // Kör simuleringen med callback för att samla data
-    run_simulation_with_animation(
-        cfg,
-        fast_materials,
-        mesh,
-        [&](double time, const std::vector<double>& pos, const std::vector<double>& temps) {
-            // Första gången: spara positions
-            if (positions.empty()) {
-                positions = pos;
-            }
-            
-            // Spara temperaturer och tid
-            all_temperatures.push_back(temps);
-            all_times.push_back(time);
-        },
-        save_interval
-    );
+    // Kör simuleringen med din nya callback-funktion
+    run_simulation(cfg, fast_materials, mesh, my_simulation_callback, save_interval);
     
     auto end_sim = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> sim_time = end_sim - start_sim;
+
+    auto end_total = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> total_time = end_total - start_total;
     
-    std::cout << "\nSimulering klar på " << sim_time.count() << " sekunder." << std::endl;
-    std::cout << "Sparade " << all_temperatures.size() << " frames för animation." << std::endl;
-    
+    std::cout << "\nCalculation time: " << total_time.count() << " s" << std::endl;
 
     if (!all_temperatures.empty()) {
-        std::cout << "\nStartar animation av temperaturutveckling..." << std::endl;
         
         TemperatureAnimator animator;
         animator.setData(positions, all_temperatures, all_times);
-        animator.animate("HFP-engine - Temperature Development Over Time");
+        animator.animate("HFP-engine");
         
         // Efter animationen, visa slutresultatet
         std::cout << "\n\n" << std::string(50, '=') << "\n";
-        std::cout << "SIMULERING AVSLUTAD - Slutresultat\n";
         std::cout << std::string(50, '=') << "\n";
         
-        // Använd den sparade datan direkt (eller hämta från animatorn)
+        // Använd den sparade datan direkt
         const auto& final_temps = all_temperatures.back();
         double final_time = all_times.back();
         
-        std::cout << "\nSluttemperaturer vid t = " 
-                  << std::fixed << std::setprecision(1) << final_time 
-                  << " s (C):\n";
+        std::cout << "\nSluttemperaturer vid t = " << final_time << " s (C):\n";
         
         // Visa temperaturer i terminalen
         for (size_t i = 0; i < positions.size(); i++) {
@@ -113,30 +114,21 @@ int main() {
         }
         
         // Spara till CSV-fil
-        std::ofstream csv("temperature_profile_final.csv");
+        std::ofstream csv("temperaturoprofil.csv");
         csv << "Position_mm;Temperature_C\n";
         for (size_t i = 0; i < positions.size(); i++) {
             csv << positions[i] << ";" << final_temps[i] << "\n";
         }
-        csv.close();
-        
-        std::cout << "\nData sparad till 'temperature_profile_final.csv'\n";
-        
+                
         // Beräkna statistik
         double max_temp = *std::max_element(final_temps.begin(), final_temps.end());
         double min_temp = *std::min_element(final_temps.begin(), final_temps.end());
         
-        std::cout << "\nStatistik:\n";
-        std::cout << "Max temperatur: " << std::fixed << std::setprecision(1) 
-                  << max_temp << " C\n";
-        std::cout << "Min temperatur: " << min_temp << " C\n";
     }
-    
-    auto end_total = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> total_time = end_total - start_total;
+
     
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "\nTotal exekveringstid: " << total_time.count() << " s" << std::endl;
+   
     
     return 0;
-}  
+}
