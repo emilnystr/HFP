@@ -2,38 +2,34 @@
 #include <algorithm>
 #include <cmath>
 
-/*Vi använder materialfilerna för att beräkna entalpikurvorna för varje material användaren ber om
-*/
 std::vector<double> getE(const Mesh& mesh, const std::vector<MaterialTable>& fast_materials,
     const std::vector<double>& T) {
     
-    std::vector<double> E(mesh.num_nodes, 0.0);
-    
-    // Första noden - enbart bidrag från hälften av första elementet
+    std::vector<double> E(mesh.num_nodes, 0);
+    //first node
     if (mesh.num_elements > 0) {
         double e0;
-        double dedT; // Ej använd här, men behövs för funktionsanrop
+        double dedT; 
         fast_materials[mesh.material_indices[0]].get_enthalpy(T[0], e0, dedT);
         E[0] = e0 * mesh.element_sizes[0] * 0.5;
     }
     
-    // Inre noder - bidrag från två element
+    // Inner nodes 
     for (int i = 1; i < mesh.num_nodes - 1; ++i) {
         double ei;
         double dedT;
         
-        // Bidrag från vänster element
+        
         fast_materials[mesh.material_indices[i-1]].get_enthalpy(T[i], ei, dedT);
         double left_contrib = ei * mesh.element_sizes[i-1] * 0.5;
         
-        // Bidrag från höger element
         fast_materials[mesh.material_indices[i]].get_enthalpy(T[i], ei, dedT);
         double right_contrib = ei * mesh.element_sizes[i] * 0.5;
         
         E[i] = left_contrib + right_contrib;
     }
     
-    // Sista noden - enbart bidrag från hälften av sista elementet
+    // final node
     if (mesh.num_elements > 0) {
         double en;
         double dedT;
@@ -66,7 +62,6 @@ std::vector<double> getTfromE(const Mesh& mesh, const std::vector<MaterialTable>
     std::vector<double> T_guess = T_prev;
     
     for (int nod = 0; nod < n; ++nod) {
-        // Homogena noder eller gränsnoder med samma material
         bool is_homogeneous = false;
         
         if (nod == 0 || nod == n-1) {
@@ -100,7 +95,7 @@ std::vector<double> getTfromE(const Mesh& mesh, const std::vector<MaterialTable>
                     if (ej1 != ej) {
                         T_out[nod] = Tj + (e_target - ej) / (ej1 - ej) * (Tj1 - Tj);
                     } else {
-                        T_out[nod] = Tj; // Fasövergång
+                        T_out[nod] = Tj; // Phase change
                     }
                     found = true;
                     break;
@@ -113,7 +108,7 @@ std::vector<double> getTfromE(const Mesh& mesh, const std::vector<MaterialTable>
         } 
         else {
             int cnt = 0;
-            double rel_fel = 1.0;
+            double rel_fel = 1;
             
             while (rel_fel > 0.01 && cnt < 50) {
                 int mat_left = mesh.material_indices[nod-1];
@@ -135,12 +130,12 @@ std::vector<double> getTfromE(const Mesh& mesh, const std::vector<MaterialTable>
                 
                 double sum_T = T_guess[nod] + T_ny;
                 if (sum_T > 1e-10) {
-                    rel_fel = 2.0 * std::abs(T_guess[nod] - T_ny) / sum_T;
+                    rel_fel = 2 * std::abs(T_guess[nod] - T_ny) / sum_T;
                 } else {
-                    rel_fel = 0.0;
+                    rel_fel = 0;
                 }
                 
-                // Justera temperatur om det tar för lång tid
+                // adjust temperature if convergence is not happening
                 if (cnt > 40) {
                     double diff = std::abs(T_guess[nod] - T_ny);
                     if (T_guess[nod] > T_ny) {

@@ -52,7 +52,6 @@ std::vector<MaterialProperty> load_materials_from_directory(
 
     std::filesystem::path material_directory(directory_path);
 
-    //bläddra igenom filer i mappen
     std::filesystem::directory_iterator directory_iterator(material_directory);
 
     for (const std::filesystem::directory_entry& entry : directory_iterator) {

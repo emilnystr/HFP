@@ -10,7 +10,7 @@ global_matrices compute_global_matrices(
 
     global_matrices K_and_C;
     K_and_C.K.assign(n, std::vector<double>(n, 0.0));
-    K_and_C.C.assign(n, 0.0);
+    K_and_C.C.assign(n, 0);
 
     auto& K = K_and_C.K;
     auto& C = K_and_C.C;
@@ -35,7 +35,6 @@ global_matrices compute_global_matrices(
 
     for (int i = 1; i < n - 1; ++i)
     {
-        // Vänster element
             int e = i - 1;
             double dx = mesh.element_sizes[e];
             double T_avg = 0.5 * (T[i-1] + T[i]);
@@ -51,7 +50,6 @@ global_matrices compute_global_matrices(
 
             C[i] += rho * c * dx * 0.5;
 
-        // Höger element
         {
             int e = i;
             double dx = mesh.element_sizes[e];
@@ -98,7 +96,7 @@ std::vector<double> matvec(
     const std::vector<std::vector<double>>& A,
     const std::vector<double>& x)
 {
-    std::vector<double> y(A.size(), 0.0);
+    std::vector<double> y(A.size(), 0);
 
     for (int i = 0; i < A.size(); ++i)
         for (int j = 0; j < A.size(); ++j)
@@ -112,7 +110,7 @@ std::vector<double> invert_C(const std::vector<double>& C)
     std::vector<double> Cinv(C.size());
 
     for (size_t i = 0; i < C.size(); ++i)
-        Cinv[i] = 1.0 / C[i];
+        Cinv[i] = 1 / C[i];
 
     return Cinv;
 }

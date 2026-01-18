@@ -36,12 +36,10 @@ void run_matrix_simulation (const Mesh& mesh, const std::vector<MaterialTable>& 
 
         T_fire = fire_temperature(current_time, cfg);
 
-        // Uppdatera globala matriser baserat på aktuell temperatur
         global_matrices K_and_C = compute_global_matrices(mesh, fast_materials, Temp);
         std::vector<std::vector<double>> K = K_and_C.K;
         std::vector<double> C = K_and_C.C;
 
-        // Randvillkor
         Q[0] = h_exposed * (T_fire - Temp[0]) +
             sigma * epsilon * (pow(T_fire + 273.15, 4) - pow(Temp[0] + 273.15, 4));
 
@@ -64,17 +62,7 @@ void run_matrix_simulation (const Mesh& mesh, const std::vector<MaterialTable>& 
             for (int j = 0; j < n_nodes; ++j)
                 Temp_next[j] = Temp[j] + dt * Cinv_QKT[j];
 
-            Temp = Temp_next;   // ← här uppdateras temperaturen
-
-            // ============================
-            // Lägg till utskrift här
-            // ============================
-            if (i == simulation_time / dt - 1) {
-                std::cout << "\nTemperaturer vid t = " << current_time << " s:\n";
-                for (int j = 0; j < n_nodes; ++j) {
-                    std::cout << "  Nod " << j << ": " << Temp[j] << " °C\n";
-                }
-            }
+            Temp = Temp_next; 
 
         }
     }

@@ -4,10 +4,8 @@ std::vector<Layer> load_layers_from_file(const std::vector<MaterialProperty>& ma
     std::vector<Layer> layers;    
     std::ifstream file("material/Material.txt");
     if (!file.is_open()) {
-        std::cout << "  Kunde inte öppna 'material/Material.txt'" << std::endl;
-       /* layers.push_back({13.0, "stal", 1});
-        layers.push_back({100.0, "betong", 0});
-        return layers;*/
+        std::cout << "  cant open 'material/Material.txt'" << std::endl;
+    
     }
     
     std::string line;
@@ -16,8 +14,8 @@ std::vector<Layer> load_layers_from_file(const std::vector<MaterialProperty>& ma
     while (std::getline(file, line)) {
         line_number++;
         for (int i = line.size() - 1; i >= 0; i--) {
-            if (line[i] != ' ') break; //hitta bokstaven
-            line.erase(i); //annars tar vi bort tecknet
+            if (line[i] != ' ') break; 
+            line.erase(i); 
 
         }
         if (line.empty()) continue;

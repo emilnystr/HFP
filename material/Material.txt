@@ -1,3 +1,2 @@
-34 material1
-46 material2
-69 material3
+
+45 material2
