@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\hfp.dir/objects.a
-C:\mingw64\bin\ar.exe qc CMakeFiles\hfp.dir/objects.a @CMakeFiles\hfp.dir\objects1.rsp
-C:\mingw64\bin\c++.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\hfp.dir/objects.a -Wl,--no-whole-archive -o C:\HFP\hfp.exe -Wl,--out-implib,libhfp.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\hfp.dir\linkLibs.rsp
