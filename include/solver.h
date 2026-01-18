@@ -9,9 +9,17 @@
 #include "material.h"
 #include "mesh.h"
 #include "fire.h"
+#include "enthalpy.h"
+#include "matrix.h"
 
+// Original skalärmetod
 void run_simulation(const parameters& cfg,
-                    const std::vector<FastMaterial>& fast_materials,
+                    const std::vector<MaterialTable>& fast_materials,
                     const Mesh& mesh);
+
+// Entalpibaserad metod
+void run_enthalpy_simulation(const parameters& cfg,
+                             const std::vector<MaterialTable>& fast_materials,
+                             const Mesh& mesh);
 
 #endif

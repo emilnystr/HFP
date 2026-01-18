@@ -9,7 +9,7 @@ istället för att utföra matrisberäkningar bygger vi beräkningen genom värm
 elementvisa beräkningar baserat på lokala temperaturgradienter
  */
 void run_simulation(const parameters& cfg,
-                    const std::vector<FastMaterial>& fast_materials,
+                    const std::vector<MaterialTable>& fast_materials,
                     const Mesh& mesh)
 {
     std::vector<double> T(mesh.num_nodes, cfg.initial_temperature);

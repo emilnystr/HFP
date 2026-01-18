@@ -15,7 +15,7 @@ public:
 // Original functions (for compatibility)
 global_matrices compute_global_matrices(
     const Mesh& mesh,
-    const std::vector<FastMaterial>& fast_materials,
+    const std::vector<MaterialTable>& fast_materials,
     const std::vector<double>& T);
 
 std::vector<double> matvec(

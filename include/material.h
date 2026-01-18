@@ -17,11 +17,12 @@ class MaterialProperty {
     std::vector<double> density;
 };
 
-class FastMaterial {
+class MaterialTable {
     public:
-    std::vector<double> k;   // Värmeledningsförmåga
-    std::vector<double> c;   // Specifik värmekapacitet
-    std::vector<double> rho; // Densitet
+    std::vector<double> k;  
+    std::vector<double> c;   
+    std::vector<double> rho; 
+    std::vector<double> enthalpy;
     
     void precompute(const std::vector<double>& temperature_input,
                    const std::vector<double>& rho_input,
@@ -41,6 +42,40 @@ class FastMaterial {
         Y_k = k[X1]   + t * (k[X2]   - k[X1]);   
         Y_c = c[X1]   + t * (c[X2]   - c[X1]);   
         Y_rho = rho[X1] + t * (rho[X2] - rho[X1]); 
+
+    }
+
+    void get_enthalpy(double T, double& e, double& dedT) const {
+        if (T < 0) T = 0;
+        if (T > 2000) T = 2000;
+        
+        int T1 = (int)T;
+        int T2 = T1 + 1;
+        
+        if (T2 >= enthalpy.size()) {
+            e = enthalpy.back();
+            dedT = 0;
+            return;
+        }
+        
+        double t = T - T1;
+        e = enthalpy[T1] + t * (enthalpy[T2] - enthalpy[T1]);
+        dedT = (enthalpy[T2] - enthalpy[T1]); //step = 1 implicit divided by 1 therefore
+    }
+
+    double get_enthalpy_value(double T) const {
+        if (T < 0) T = 0;
+        if (T > 2000) T = 2000;
+        
+        int T1 = (int)T;
+        int T2 = T1 + 1;
+        
+        if (T2 >= enthalpy.size()) {
+            return enthalpy.back();
+        }
+        
+        double t = T - T1;
+        return enthalpy[T1] + t * (enthalpy[T2] - enthalpy[T1]);
 }
 
 
