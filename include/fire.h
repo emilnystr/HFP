@@ -6,7 +6,8 @@
 
 double iso_fire_curve(double time);
 double hc180_fire_curve(double time);
-double parametric_fire(double time);
+double parametric_fire(double time, const parameters& cfg);
+
 
 double fire_temperature(double time, const parameters& cfg);
 

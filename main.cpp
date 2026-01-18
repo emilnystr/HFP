@@ -11,6 +11,9 @@
 #include "mesh.h"
 #include "solver.h"
 #include "plotter.h"
+#include "enthalpy.h"
+
+
 
 // Deklarera globala variabler för att lagra data
 std::vector<std::vector<double>> all_temperatures;
@@ -18,7 +21,7 @@ std::vector<double> all_times;
 std::vector<double> positions;
 
 // Din nya callback-funktion (inte lambda)
-void my_simulation_callback(double time, 
+void simulation_callback(double time, 
                            const std::vector<double>& pos, 
                            const std::vector<double>& temps) {
     // Första gången: spara positions
@@ -38,10 +41,10 @@ int main() {
     
     parameters cfg = load_config("Config.txt");
     
-    std::cout << "  Modell: " << cfg.model << std::endl;
-    std::cout << "  Simuleringstid: " << cfg.simulation_time << " s" << std::endl;
-    std::cout << "  Tidssteg: " << cfg.time_step << " s ";
-    std::cout << "  Brandkurva: ";
+    std::cout << "  Model: " << cfg.model << std::endl;
+    std::cout << "  simulation time: " << cfg.simulation_time << " s" << std::endl;
+    std::cout << "  time step: " << cfg.time_step << " s ";
+    std::cout << "  fire curve: ";
     if (cfg.fire_curve_exposed == 1)
         std::cout << "ISO 834";
     else if (cfg.fire_curve_exposed == 2)
@@ -49,7 +52,7 @@ int main() {
     else if (cfg.fire_curve_exposed == 3)
         std::cout << "Parametrisk";
     else if (cfg.fire_curve_exposed == 4)
-        std::cout << "Konstant (" << cfg.constant_surface_temp << " °C)";
+        std::cout << "constant temperature (" << cfg.constant_surface_temp << " °C)";
 
     std::cout << std::endl;
     
@@ -67,22 +70,30 @@ int main() {
     
     auto layers = load_layers_from_file(materials);
     Mesh mesh = create_mesh(layers, cfg);
+
+    int save_interval = 1;
     
-    // Rensa de globala variablerna
+    all_temperatures.clear();
+    all_times.clear();
+    positions.clear();
+    if (cfg.model == 1) {
+        std::cout << "\nScalar method\n";
+        run_simulation(cfg, fast_materials, mesh, simulation_callback, save_interval);
+    } 
+    else if (cfg.model == 2) {
+    std::cout << "\nEnthalpy method\n";
+    
     all_temperatures.clear();
     all_times.clear();
     positions.clear();
     
-    std::cout << "\nKör simulering och samlar data för animation..." << std::endl;
     
-    // Beräkna hur många steg vi ska spara
+    run_enthalpy_simulation(cfg, fast_materials, mesh, simulation_callback, save_interval);
+}
+        
     int total_steps = static_cast<int>(cfg.simulation_time / cfg.time_step);
-    int save_interval = 1;
     
     auto start_sim = std::chrono::high_resolution_clock::now();
-    
-    // Kör simuleringen med din nya callback-funktion
-    run_simulation(cfg, fast_materials, mesh, my_simulation_callback, save_interval);
     
     auto end_sim = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> sim_time = end_sim - start_sim;
@@ -98,9 +109,6 @@ int main() {
         animator.setData(positions, all_temperatures, all_times);
         animator.animate("HFP-engine");
         
-        // Efter animationen, visa slutresultatet
-        std::cout << "\n\n" << std::string(50, '=') << "\n";
-        std::cout << std::string(50, '=') << "\n";
         
         // Använd den sparade datan direkt
         const auto& final_temps = all_temperatures.back();
@@ -113,14 +121,12 @@ int main() {
             std::cout << positions[i] << " mm: " << final_temps[i] << " C\n";
         }
         
-        // Spara till CSV-fil
         std::ofstream csv("temperaturoprofil.csv");
         csv << "Position_mm;Temperature_C\n";
         for (size_t i = 0; i < positions.size(); i++) {
             csv << positions[i] << ";" << final_temps[i] << "\n";
         }
                 
-        // Beräkna statistik
         double max_temp = *std::max_element(final_temps.begin(), final_temps.end());
         double min_temp = *std::min_element(final_temps.begin(), final_temps.end());
         
@@ -128,7 +134,6 @@ int main() {
 
     
     std::cout << std::fixed << std::setprecision(2);
-   
     
     return 0;
 }

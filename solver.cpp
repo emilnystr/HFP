@@ -36,8 +36,7 @@ void run_simulation(
         }
     }
 
-    // Anropa callback-funktionen för initiala temperaturer
-    callback(0.0, positions_mm, T);
+    callback(0, positions_mm, T);
     
     
 
@@ -84,14 +83,12 @@ void run_simulation(
             T_next[i] = T[i] + dt * (Q_eff[i] / C[i]);
         }
 
-        // Anropa callback-funktionen för varje tidssteg
         callback(current_time, positions_mm, T_next);
         last_saved_step = step;
         
         std::swap(T, T_next);
     }
 
-    // Se till att sista tiden sparas
     double final_time = time_steps * dt;
     callback(final_time, positions_mm, T);
     

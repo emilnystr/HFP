@@ -7,19 +7,18 @@
 
 class TemperatureAnimator {
 private:
-    GLFWwindow* window; //pointer till  GLFW fönster
+    GLFWwindow* window; 
     int width;
     int height;
     
-    std::vector<std::vector<double>> all_temperatures; // Temperaturer för varje frame, varje frame = ett tidssteg
-    std::vector<double> positions_mm;                  // Positioner (samma för alla frames)
-    std::vector<double> time_steps;                    // Tider för varje frame
+    std::vector<std::vector<double>> all_temperatures; 
+    std::vector<double> positions_mm;                 
+    std::vector<double> time_steps;                    
     
     // Animation state
     int current_frame;
     bool is_playing;
     float animation_speed;    
-    // Grafikparametrar
     float minX, maxX, minY, maxY;
     float padding;
     
@@ -40,7 +39,7 @@ public:
     
     void animate(const std::string& title = "HFP Engine - Temperature Animation");
     
-    // Funktioner för att hämta slutresultat
+    
     std::vector<double> getFinalTemperatures() const;
     std::vector<double> getPositions() const;
     double getFinalTime() const;
@@ -48,4 +47,4 @@ public:
     static void framebuffer_size_callback(struct GLFWwindow* window, int width, int height);
 };
 
-#endif // PLOTTER_H
+#endif 

@@ -5,18 +5,17 @@ parameters load_config (const std::string& filename) {
 
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cout << "  Kunde inte öppna " << filename << ". Använder standardvärden." << std::endl;
+        std::cout << "  cant open " << filename << ". using standard configuration." << std::endl;
         return config;
     }
 
     std::string line;
-    //vi läser radvis
+    
     while (std::getline(file, line)) {
 
-        //trimma strängen
         for (int i = line.size() - 1; i >= 0; i--) {
-            if (line[i] != ' ') break; //hitta bokstaven
-            line.erase(i); //annars tar vi bort tecknet
+            if (line[i] != ' ') break; 
+            line.erase(i); 
 
         }
         if (line.empty()) continue;
@@ -34,7 +33,7 @@ parameters load_config (const std::string& filename) {
             if (line[i] == '=') break;
             key += line[i];
         }
-        key.pop_back(); //tar bort mellanslaget, viktigt här att användaren skriver indata såhär: model = 1
+        key.pop_back();
 
         if (key == "MODEL") {
             config.model = std::stoi(value);

@@ -48,3 +48,5 @@ Run the executable through you terminal and the final temperature will show. It 
 ## Author
 
 Developed by Emil Nyström, fire safety specialist.
+
+compiling with  g++ *.cpp -std=c++17 -Iinclude -IDependencies/GLFW/include -LDependencies/GLFW/lib -lglfw3 -lgdi32 -lopengl32 -o hfp.exe
