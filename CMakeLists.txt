@@ -9,11 +9,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-message(STATUS "=== HFP Build Configuration ===")
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "Source dir: ${CMAKE_SOURCE_DIR}")
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Optimization: DEBUG (O0)")
     add_compile_options(-g -O0 -Wall -Wextra -Wshadow)
@@ -55,16 +50,8 @@ if(NUM_SOURCES EQUAL 0)
     file(GLOB HFP_SOURCES CONFIGURE_DEPENDS "*.cpp")
 endif()
 
-message(STATUS "Source files: ${NUM_SOURCES} .cpp files found")
-
 set(GLFW_LIB_DIR "${CMAKE_SOURCE_DIR}/Dependencies/GLFW/lib")
 set(GLFW_INC_DIR "${CMAKE_SOURCE_DIR}/Dependencies/GLFW/include")
-
-if(NOT EXISTS "${GLFW_LIB_DIR}/libglfw3.a")
-    message(FATAL_ERROR "GLFW static library not found at: ${GLFW_LIB_DIR}/libglfw3.a")
-endif()
-
-message(STATUS "GLFW: Static linking from ${GLFW_LIB_DIR}")
 
 add_executable(hfp ${HFP_SOURCES})
 
@@ -103,8 +90,3 @@ set_target_properties(hfp PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_NAME "hfp"
 )
-
-message(STATUS "========================================")
-message(STATUS "Target: hfp.exe (Release: ${CMAKE_BUILD_TYPE})")
-message(STATUS "Output: ${CMAKE_SOURCE_DIR}/hfp.exe")
-message(STATUS "========================================")

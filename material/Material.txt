@@ -1,2 +1,2 @@
 
-45 material1
+100 material2
