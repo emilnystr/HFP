@@ -13,7 +13,8 @@ public:
 global_matrices compute_global_matrices(
     const Mesh& mesh,
     const std::vector<MaterialTable>& fast_materials,
-    const std::vector<double>& T);
+    const std::vector<double>& T,
+    const parameters& cfg);
 
 std::vector<double> matvec(
     const std::vector<std::vector<double>>& A,

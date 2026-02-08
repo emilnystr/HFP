@@ -1,2 +1,3 @@
-
-100 material2
+10 material1
+500 void
+20 material2

@@ -57,6 +57,9 @@ parameters load_config (const std::string& filename) {
         } else if (key == "EPSILON") {
             config.emissivity = std::stod(value);
 
+        } else if (key == "H_VOID"){
+            config.h_void = std::stod(value);
+
         } else if (key == "H_EXPOSED") {
             config.h_exposed = std::stod(value);
 

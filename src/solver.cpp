@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include "heat_transfer.h"
+
 
 void run_simulation(
     const parameters& cfg,
@@ -49,9 +51,10 @@ void run_simulation(
         std::fill(Q_eff.begin(), Q_eff.end(), 0.0);
         std::fill(C.begin(), C.end(), 0.0);
 
+
         for (int e = 0; e < n_elem; ++e) {
-            int i = e;       
-            int j = e + 1;   
+            int i = e;
+            int j = e + 1;
             double T_average = 0.5 * (T[i] + T[j]);
 
             double k, c, rho;
@@ -61,9 +64,22 @@ void run_simulation(
             C[i] += rho * c * dx * 0.5;
             C[j] += rho * c * dx * 0.5;
 
-            double q = (k / dx) * (T[i] - T[j]);
-            Q_eff[i] -= q;
-            Q_eff[j] += q;
+            if (k == 0.0) {
+                double Qi, Qj;
+                heat_flow_void(T[i], T[j],
+                            cfg.emissivity,
+                            cfg.stefan_boltzmann,
+                            cfg.h_void,
+                            Qi, Qj);
+
+                Q_eff[i] += Qi;
+                Q_eff[j] += Qj;
+            } else {
+                double q = (k / dx) * (T[i] - T[j]);
+                Q_eff[i] -= q;
+                Q_eff[j] += q;
+            }
+
         }
 
         double T_front = T[0];

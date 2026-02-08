@@ -21,6 +21,7 @@ class parameters {
     double ambient_temperature = 20;
     int fire_curve_exposed = 2;
     double constant_surface_temp = 1000;
+    double h_void = 4;
 
     double Av = 30;
     double At = 500;

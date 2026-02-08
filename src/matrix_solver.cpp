@@ -8,7 +8,7 @@ void run_matrix_simulation (const Mesh& mesh, const std::vector<MaterialTable>& 
     std::vector<double> Temp(mesh.num_nodes, 20);
     std::vector<double> Q(mesh.num_nodes, 0);
 
-    global_matrices K_and_C = compute_global_matrices(mesh, fast_materials, Temp);
+    global_matrices K_and_C = compute_global_matrices(mesh, fast_materials, Temp, cfg);
 
     
     const int n_elems = mesh.num_elements;
@@ -36,7 +36,7 @@ void run_matrix_simulation (const Mesh& mesh, const std::vector<MaterialTable>& 
 
         T_fire = fire_temperature(current_time, cfg);
 
-        global_matrices K_and_C = compute_global_matrices(mesh, fast_materials, Temp);
+        global_matrices K_and_C = compute_global_matrices(mesh, fast_materials, Temp, cfg);
         std::vector<std::vector<double>> K = K_and_C.K;
         std::vector<double> C = K_and_C.C;
 
