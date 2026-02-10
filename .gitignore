@@ -1,6 +1,5 @@
 # C++ och CMake
 build/
-*.exe
 *.o
 *.obj
 *.out
