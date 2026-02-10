@@ -15,21 +15,17 @@
 
 
 
-// Deklarera globala variabler för att lagra data
 std::vector<std::vector<double>> all_temperatures;
 std::vector<double> all_times;
 std::vector<double> positions;
 
-// Din nya callback-funktion (inte lambda)
 void simulation_callback(double time, 
                            const std::vector<double>& pos, 
                            const std::vector<double>& temps) {
-    // Första gången: spara positions
     if (positions.empty()) {
         positions = pos;
     }
     
-    // Spara temperaturer och tid
     all_temperatures.push_back(temps);
     all_times.push_back(time);
 }
@@ -110,13 +106,11 @@ int main() {
         animator.animate("HFP-engine");
         
         
-        // Använd den sparade datan direkt
         const auto& final_temps = all_temperatures.back();
         double final_time = all_times.back();
         
         std::cout << "\nSluttemperaturer vid t = " << final_time << " s (C):\n";
         
-        // Visa temperaturer i terminalen
         for (size_t i = 0; i < positions.size(); i++) {
             std::cout << positions[i] << " mm: " << final_temps[i] << " C\n";
         }

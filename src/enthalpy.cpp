@@ -6,7 +6,6 @@ std::vector<double> getE(const Mesh& mesh, const std::vector<MaterialTable>& fas
     const std::vector<double>& T) {
     
     std::vector<double> E(mesh.num_nodes, 0);
-    //first node
     if (mesh.num_elements > 0) {
         double e0;
         double dedT; 
@@ -29,7 +28,6 @@ std::vector<double> getE(const Mesh& mesh, const std::vector<MaterialTable>& fas
         E[i] = left_contrib + right_contrib;
     }
     
-    // final node
     if (mesh.num_elements > 0) {
         double en;
         double dedT;
@@ -135,7 +133,7 @@ std::vector<double> getTfromE(const Mesh& mesh, const std::vector<MaterialTable>
                     rel_fel = 0;
                 }
                 
-                // adjust temperature if convergence is not happening
+                // adjust temperature if convergence is not happening, like TASEF
                 if (cnt > 40) {
                     double diff = std::abs(T_guess[nod] - T_ny);
                     if (T_guess[nod] > T_ny) {

@@ -6,6 +6,8 @@
 #include "heat_transfer.h"
 
 
+/*Skalärmetoden enligt Ulf Wickströms bok, vi bygger alltså inga matriser utan räknar ut värmeflödet över varje element*/
+
 void run_simulation(
     const parameters& cfg,
     const std::vector<MaterialTable>& fast_materials,

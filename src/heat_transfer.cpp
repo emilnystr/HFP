@@ -1,8 +1,7 @@
 #include "heat_transfer.h"
 #include <cmath>
 
-void heat_flow_void(double T1, double T2,
-                    double epsilon, double sigma, double h_void,
+void heat_flow_void(double T1, double T2, double epsilon, double sigma, double h_void,
                     double& Qi, double& Qj)
 {
     double T1K = T1 + 273.15;

@@ -14,7 +14,7 @@ Mesh create_mesh(const std::vector<Layer>& layers, const parameters& cfg) {
         
         double remainder = fmod(thickness_mm, cfg.mm_per_layer); //beräkna rest
         
-        //om tjocklek och elementstorlek är jämnt delbara
+        //om tjocklek och elementstorlek är jämnt delbara, eftersom fmod returnerar en double bör vi inte jämföra med == 0
         if (remainder < 0.00000001) {
             num_elements = (int)(thickness_mm / cfg.mm_per_layer);
             actual_dx = dx_target;

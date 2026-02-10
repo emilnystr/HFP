@@ -13,7 +13,6 @@ void MaterialTable::precompute(const std::vector<double>& temperature_input,
     for (int t = 0; t < table_size; ++t) {
         double temp = (double)t;
         
-        // Linjär interpolation
         if (temp <= temperature_input.front()) {
             k[t] = k_input.front();       
             c[t] = cp_input.front();      
@@ -37,7 +36,7 @@ void MaterialTable::precompute(const std::vector<double>& temperature_input,
         }
     }
     enthalpy[0] = 0;
-//build the enthalpy table
+//build enthalpy table
     for (int t = 1; t < table_size; ++t) {
         double dT = 1;
         enthalpy[t] = enthalpy[t - 1] + c[t] * rho[t] * dT;

@@ -1,6 +1,5 @@
 #include "solver.h"
-#include "heat_transfer.h"  // Lägg till detta
-#include <vector>
+#include "heat_transfer.h" 
 #include <algorithm>
 #include <iostream>
 #include <cmath>
@@ -41,7 +40,6 @@ void run_enthalpy_simulation(const parameters& cfg,
         double time = step * dt;
         double T_fire = fire_temperature(time, cfg);
         
-        // Uppdatera anropet för att inkludera cfg-parametern
         global_matrices matrices = compute_global_matrices(mesh, fast_materials, T, cfg);
         std::vector<std::vector<double>>& K = matrices.K;
         std::vector<double>& C = matrices.C;
@@ -86,15 +84,12 @@ void run_enthalpy_simulation(const parameters& cfg,
         }
 
         
-        // Uppdatera entalpin
         for (int i = 0; i < n_nodes; ++i) {
             E[i] += dt * (Q[i] - KT[i]);
         }
         
-        // Beräkna nya temperaturer från entalpin
         T = getTfromE(mesh, fast_materials, T, E);
 
-        // Spara eller uppdatera callback
         if (save_interval > 0 && step % save_interval == 0) {
             callback(time, positions_mm, T);
         }
@@ -103,7 +98,6 @@ void run_enthalpy_simulation(const parameters& cfg,
     double final_time = time_steps * dt;
     callback(final_time, positions_mm, T);
     
-    // Skriv temperaturprofil till fil
     std::ofstream profile_csv("temperature_profile_entalpi.csv");
     profile_csv << "Position_mm;Temperatur_C\n";
     
