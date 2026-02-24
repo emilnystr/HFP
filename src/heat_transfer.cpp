@@ -4,12 +4,10 @@
 void heat_flow_void(double T1, double T2, double epsilon, double sigma, double h_void,
                     double& Qi, double& Qj)
 {
-    double T1K = T1 + 273.15;
-    double T2K = T2 + 273.15;
     double Tm  = 0.5 * (T1 + T2);
 
     //strålning
-    double q_rad_i = epsilon * sigma * (std::pow(T2K,4) - std::pow(T1K,4));
+    double q_rad_i = epsilon * sigma * (std::pow(T2 + 273.15,4) - std::pow(T1 + 273.15,4));
     double q_rad_j = -q_rad_i;
 
     //konvektion
